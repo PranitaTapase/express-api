@@ -13,7 +13,18 @@ exports.checkID = (req, res,next, val)=>{
     next();
 
 }
-
+//create checkBody Middleware
+exports.checkBody = function (req,res, next) {
+    console.log('CheckBody');
+    //check if body contains name and price
+    if(!req.body.name || !req.body.price){
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid Input'
+        })
+    }
+    next();
+}
 //read Json data from file 
 const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)

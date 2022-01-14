@@ -5,23 +5,17 @@ const router = express.Router();
 
 router.param('id', tourController.checkID);
 
-//create checkBody Middleware
-const checkBody = function (req,res, next) {
-    console.log('CheckBody');
-    //check if body contains name and price
-    console.log(req);
-    next();
-}
+
 
 router
     .route('/')
     .get(tourController.getAllTours)// Another way: .get(getAlltours)
-    .post(tourController.createTours);
+    .post(tourController.checkBody,tourController.createTours);//chaining middleware
 
 router
     .route('/:id/:x?')
     .get(tourController.getTour)
-    .patch(checkBody,tourController.updateTours)
+    .patch(tourController.checkBody,tourController.updateTours)
     .delete(tourController.deleteTour);
 
 module.exports = router;

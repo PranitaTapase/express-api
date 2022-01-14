@@ -9,8 +9,11 @@ const app = express();
 
 //Middleware: Modify incoming data
 app.use(express.json());
-app.use(morgan('dev'));
+if(process.env.NODE_ENV === 'development'){
+    app.use(morgan('dev'));
+}
 
+app.use(express.static(`${__dirname}/public`));//Static Files
 //Creating our own Middleware
 app.use((req,res, next) => {
     console.log('Hello from the Middleware');
