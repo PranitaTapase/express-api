@@ -1,8 +1,8 @@
 const express = require('express');
+//const fs = require('fs');
+const Tour = require('../models/tourModels');
 
-const fs = require('fs');
-
-exports.checkID = (req, res, next, val) => {
+/* exports.checkID = (req, res, next, val) => {
   console.log(`Tour Id is ${val}`);
   if (req.params.id * 1 > tours.length) {
     return res.status(404).json({
@@ -12,8 +12,9 @@ exports.checkID = (req, res, next, val) => {
   }
   next();
 };
+ */
 //create checkBody Middleware
-exports.checkBody = function (req, res, next) {
+/* exports.checkBody = function (req, res, next) {
   console.log('CheckBody');
   //check if body contains name and price
   if (!req.body.name || !req.body.price) {
@@ -23,11 +24,11 @@ exports.checkBody = function (req, res, next) {
     });
   }
   next();
-};
-//read Json data from file
+}; */
+/* //read Json data from file
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-);
+); */
 
 //Get Request
 exports.getAllTours = (req, res) => {
@@ -36,10 +37,10 @@ exports.getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
     requestedAt: req.requestTime,
-    results: tours.length,
-    data: {
-      tours: tours,
-    },
+    // results: tours.length,
+    // data: {
+    //   tours: tours,
+    // },
   });
 };
 
@@ -47,7 +48,7 @@ exports.getAllTours = (req, res) => {
 exports.getTour = (req, res) => {
   //console.log(req.params);
   const id = req.params.id * 1; //converting string to no
-  const tour = tours.find((el) => el.id === id);
+  /* const tour = tours.find((el) => el.id === id);
 
   //checkId
   /* //if(id > tours.length) {
@@ -57,36 +58,37 @@ exports.getTour = (req, res) => {
             message: 'Invalid ID'
         })
     } */
-
+  /*
   res.status(200).json({
     status: 'success',
     data: {
       tours: tour,
     },
-  });
+  }); */
 };
 
 //Post Request
-exports.createTours = (req, res) => {
+exports.createTours = async (req, res) => {
   //console.log(req.body);
+  try {
+    //Create Documents
+    // const newTour = new Tout({});
+    // newTour.save()
 
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
+    const newTour = await Tour.create(req.body);
 
-  tours.push(newTour);
-
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          tours: newTour,
-        },
-      });
-    }
-  );
+    res.status(201).json({
+      status: 'success',
+      data: {
+        tours: newTour,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Invalid Data Sent',
+    });
+  }
 
   //res.end('Done'); //always need to send response to complete req res cycle
 };
