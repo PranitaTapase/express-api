@@ -34,7 +34,40 @@ const tours = JSON.parse(
 exports.getAllTours = async (req, res) => {
   //console.log(req.requestTime);
   try {
-    const tours = await Tour.find();
+    //1A.Filtering API request
+    //Build Query
+    console.log(req.query);
+    /*     const tours = await Tour.find({
+      difficulty: 'easy',
+    }); */
+
+    //const tours = await Tour.find().where('difficulty').equals('easy');
+
+    const queryObj = { ...req.query };
+    const excludeFields = ['page', 'sort', 'limit', 'fields'];
+    excludeFields.forEach((el) => delete queryObj[el]);
+    //console.log(req.query,queryObj);
+
+    //1B.Advanced Filtering
+    //{difficulty: 'easy', price: {$gte: 1000}}
+    //{ difficulty: 'easy', price: { gte: '1000' } }
+    //gte,gt,lte,lt
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    //console.log(JSON.parse(queryStr));
+
+    let query = Tour.find(JSON.parse(queryStr));
+
+    //2.Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
+    //Execute query
+    const tours = await query;
+    //Send Response
     res.status(200).json({
       status: 'success',
       requestedAt: req.requestTime,
