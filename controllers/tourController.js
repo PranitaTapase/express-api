@@ -1,7 +1,7 @@
 const express = require('express');
 //const fs = require('fs');
 const Tour = require('../models/tourModels');
-
+const APIFeatures = require('./../utils/apiFeatures');
 
 /* exports.checkID = (req, res, next, val) => {
   console.log(`Tour Id is ${val}`);
@@ -39,11 +39,12 @@ exports.aliasTopTours = (req,res,next) => {
 };
 
 
+
+
 //Get Request
 exports.getAllTours = async (req, res) => {
-  //console.log(req.requestTime);
   try {
-    //1A.Filtering API request
+  /*  //1A.Filtering API request
     //Build Query
     console.log(req.query);
     /*     const tours = await Tour.find({
@@ -52,7 +53,7 @@ exports.getAllTours = async (req, res) => {
 
     //const tours = await Tour.find().where('difficulty').equals('easy');
 
-    const queryObj = { ...req.query };
+/*    const queryObj = { ...req.query };
     const excludeFields = ['page', 'sort', 'limit', 'fields'];
     excludeFields.forEach((el) => delete queryObj[el]);
     //console.log(req.query,queryObj);
@@ -66,17 +67,17 @@ exports.getAllTours = async (req, res) => {
     //console.log(JSON.parse(queryStr));
 
     let query = Tour.find(JSON.parse(queryStr));
-
+*/
     //2.Sorting
-    if (req.query.sort) {
+/*    if (req.query.sort) {
       const sortBy = req.query.sort.split(',').join(' ');
       query = query.sort(sortBy);
     } else {
       query = query.sort('-createdAt');
     }
-
+*/
     //3. Field Limiting
-    if(req.query.fields){
+/*    if(req.query.fields){
       const fields = req.query.fields.split(',').join(' ');
       query = query.select(fields);
       console.log(fields);
@@ -84,9 +85,9 @@ exports.getAllTours = async (req, res) => {
     else{
       query = query.select("-__v");
     }
-
+*/
     //4. Pagination
-    const page =req.query.page * 1 || 1;
+/*    const page =req.query.page * 1 || 1;
     const limit = req.query.limit * 1 || 100;
     const skip = (page - 1) * limit;
     query = query.skip(skip).limit(limit);
@@ -95,9 +96,16 @@ exports.getAllTours = async (req, res) => {
       const numTours = await Tour.countDocuments();
       if(skip >= numTours) throw new Error('This page does not exit.')
     }
-
+*/
     //Execute query
-    const tours = await query;
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+      
+    const tours = await features.query;
+    
     //Send Response
     res.status(200).json({
       status: 'success',
