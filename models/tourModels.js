@@ -1,4 +1,6 @@
+/* eslint-disable prefer-arrow-callback */
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 //Creating Model
 const tourSchema = new mongoose.Schema(
   {
@@ -8,6 +10,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    slug: String,
     duration: {
       type: Number,
       required: [true, 'A tour must have a duration'],
@@ -53,6 +56,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -65,9 +72,35 @@ tourSchema.virtual('durationWeeks').get(function () {
 });
 
 //Document Middleware: Runs before .save() and .create() and not on .insertmMany()
-tourSchema.pre('save', function () {
-  console.log(this);
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
 });
+
+/*tourSchema.pre('save', function (next) {
+  console.log('Saving Now');
+  next();
+});
+
+tourSchema.post('save', function (doc, next) {
+  console.log(doc);
+  next();
+}); */
+
+//Query Middleware
+//tourSchema.pre('find', function (next) {
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
+  this.start = Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  console.log(Date.now() - this.start);
+  //console.log(docs);
+  next();
+});
+
 //Creating Collection
 const Tour = mongoose.model('Tour', tourSchema);
 
