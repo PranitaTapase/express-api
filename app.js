@@ -27,6 +27,7 @@ app.use((req, res, next) => {
   next();
 });
 
+
 ////Route Handlers
 ////Routes
 //app.get('/api/v1/tours', getAllTours);
