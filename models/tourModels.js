@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow-callback */
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const validator = require('validator');
+//const validator = require('validator');
 //Creating Model
 const tourSchema = new mongoose.Schema(
   {
@@ -11,7 +11,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       maxlength: [40, 'Name too long! Try short one in 40 char.'],
-      minlength: [10, 'More than 10 char buddy!'],
+      minlength: [10, 'Tour Name should be more than 10 char buddy!'],
       //validate: [validator.isAlpha, 'Only letters dumbass'],
     },
     slug: String,
@@ -28,14 +28,14 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour must have a difficulty'],
       enum: {
         values: ['easy', 'medium', 'difficult'],
-        message: 'DME boss only DME',
+        message: 'A tour must be easy, medium, difficult',
       },
     },
     ratingsAverage: {
       type: Number,
       default: 4.5,
       min: [1, 'Rating > 1.o'],
-      max: [5, 'T5hank you but should be less than 5'],
+      max: [5, 'Ratings from 1 to 5'],
     },
     ratingsQuantity: {
       type: Number,
@@ -52,7 +52,7 @@ const tourSchema = new mongoose.Schema(
           //this only points to current doc on New doc creation and not on update
           return val < this.price;
         },
-        message: 'Discount ({VALUE}) should be < price'
+        message: 'Discount ({VALUE}) should be < price',
       },
     },
     summary: {
@@ -115,7 +115,7 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 tourSchema.post(/^find/, function (docs, next) {
-  console.log(Date.now() - this.start);
+  //console.log(Date.now() - this.start);
   //console.log(docs);
   next();
 });
