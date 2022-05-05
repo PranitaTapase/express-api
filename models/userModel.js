@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Password is required'],
     //validator: [validator.isStrongPassword,  'Password is weak']
     minlength: 8,
+    select: false, //Won't show in output
   },
   passwordConfirm: {
     type: String,
@@ -48,6 +49,15 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined;
   next();
 });
+
+//Instance Method
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  //this.password not available due to select:false on password
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 const User = mongoose.model('User', userSchema);
 
