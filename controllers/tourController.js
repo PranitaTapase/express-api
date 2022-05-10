@@ -64,10 +64,11 @@ exports.createTours = catchAsync(async (req, res, next) => {
 
 //Patch Request
 exports.updateTours = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findOneAndUpdate(req.param.id, req.body, {
+  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
+
   if (!tour) {
     return next(new AppError('No tour found with the ID', 404));
   }
@@ -87,7 +88,7 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
   }
   res.status(204).json({
     status: 'success',
-    data: tour,
+    data: null,
   });
 });
 

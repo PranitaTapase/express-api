@@ -9,13 +9,14 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-exports.signup = catchAsync(async (req, res, next) => {
+exports.signup = catchAsync(async (req, res, _next) => {
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     passwordChangedAt: req.body.passwordChangedAt,
+    role: req.body.role,
   }); //User.save
 
   const token = signToken(newUser._id);
@@ -50,7 +51,7 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.protect = catchAsync(async (req, res, next) => {
+exports.protect = catchAsync(async (req, _res, next) => {
   //1. Getting token and check token exist
   let token;
   if (
@@ -77,3 +78,13 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   next();
 });
+
+exports.restrictTo =
+  (...roles) =>
+  (req, _res, next) => {
+    //roles: ['admin', 'lead-guide']
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError('Permission denied.', 403));
+    }
+    next();
+  };
