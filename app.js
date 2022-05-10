@@ -1,4 +1,4 @@
-const fs = require('fs');
+//const fs = require('fs');
 const express = require('express');
 const morgan = require('morgan');
 
@@ -26,7 +26,6 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
-
 
 ////Route Handlers
 ////Routes

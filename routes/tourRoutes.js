@@ -2,7 +2,7 @@ const express = require('express');
 const tourController = require('../controllers/tourController');
 //Another way: const {getAlltours, , } = require('');
 const router = express.Router();
-
+const authController = require('../controllers/authController');
 //router.param('id', tourController.checkID);
 //API: Aliasing
 router
@@ -14,7 +14,7 @@ router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 
 router
   .route('/')
-  .get(tourController.getAllTours) // Another way: .get(getAlltours)
+  .get(authController.protect, tourController.getAllTours) // Another way: .get(getAlltours)
   .post(tourController.createTours); //chaining middleware
 
 router
