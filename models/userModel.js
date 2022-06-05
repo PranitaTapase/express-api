@@ -54,6 +54,13 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+//Query Middleware
+userSchema.pre(/^find/, function (next) {
+  //this points to current query
+  this.find({ active: { $ne: false } });
+  next();
+});
+
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
   this.passwordChangedAt = Date.now() - 1000;
@@ -70,12 +77,6 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-//Query Middleware
-userSchema.pre('/^find/', function (next) {
-  //this points to current query
-  this.find({ });
-  next();
-});
 //Instance Method
 userSchema.methods.correctPassword = async function (
   candidatePassword,
